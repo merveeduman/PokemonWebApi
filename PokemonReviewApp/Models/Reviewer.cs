@@ -1,6 +1,4 @@
-﻿using PokemonReviewApp.Models;
-
-namespace PokemonReviewApp
+﻿namespace PokemonReviewApp.Models
 {
     public class Reviewer
     {
