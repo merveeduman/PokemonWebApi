@@ -16,13 +16,13 @@ Swagger: A tool used for automated documentation and testing of the API.
 AutoMapper: A tool used for data transfer between objects (model transformation using DTO - Data Transfer Object).
 
 #### Project Features
-Pokemon Management:
+#### Pokemon Management:
 
 Pokemons can be added, updated, deleted, and listed.
 
 Relationships can be established with categories and reviews of Pokemon.
 
-Category Management:
+#### Category Management:
 
 Categories can be added and updated for Pokemon.
 
