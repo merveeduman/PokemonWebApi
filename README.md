@@ -5,7 +5,7 @@ Pokemon Web API is a Pokemon database management system and review platform. The
 This project is a RESTful Web API developed using ASP.NET Core. The API provides all the CRUD (Create, Read, Update, Delete) operations required to manage resources such as Pokemon, Category, Owner, and Review. The API allows users to review Pokemon, manage Pokemon and categories, and maintain owner information.
 
 #### Technologies Used
-ASP.NET Core 5.0+: A modern framework used to create the Web API.
+ASP.NET Core: A modern framework used to create the Web API.
 
 Entity Framework Core: An ORM (Object Relational Mapper) tool used for database operations.
 
