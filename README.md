@@ -1,63 +1,62 @@
-Pokemon Web API
-Pokemon Web API, bir Pokemon veritabanı yönetim sistemi ve yorum/inceleme platformudur. API, Pokemon'ları, kategorileri, incelemeleri ve sahipleri yönetmeye yönelik bir dizi endpoint sağlar. Bu API, web ve mobil uygulamalar gibi istemciler için backend hizmeti sunmaktadır.
+## Pokemon Web API
+Pokemon Web API is a Pokemon database management system and review platform. The API provides a set of endpoints for managing Pokemon, categories, reviews, and owners. This API provides backend services for clients such as web and mobile applications.
 
-Proje Özeti
-Bu proje, ASP.NET Core kullanılarak geliştirilmiş bir RESTful Web API'dir. API, Pokemon, Category, Owner, Review gibi kaynakları yönetmek için gerekli tüm CRUD (Create, Read, Update, Delete) işlemlerini sağlar. API, kullanıcıların Pokemon incelemeleri yapmalarını, Pokemon'ları ve kategorileri yönetmelerini ve sahip bilgilerini tutmalarını sağlar.
+#### Project Summary
+This project is a RESTful Web API developed using ASP.NET Core. The API provides all the CRUD (Create, Read, Update, Delete) operations required to manage resources such as Pokemon, Category, Owner, and Review. The API allows users to review Pokemon, manage Pokemon and categories, and maintain owner information.
 
-Kullanılan Teknolojiler
-ASP.NET Core 5.0+: Web API'yi oluşturmak için kullanılan modern bir framework.
+#### Technologies Used
+ASP.NET Core 5.0+: A modern framework used to create the Web API.
 
-Entity Framework Core: Veritabanı işlemleri için kullanılan ORM (Object Relational Mapper) aracı.
+Entity Framework Core: An ORM (Object Relational Mapper) tool used for database operations.
 
-SQL Server: Veritabanı yönetim sistemi olarak kullanıldı.
+SQL Server: Used as the database management system.
 
-Swagger: API'nin otomatik dokümantasyonu ve test edilmesi için kullanılan araç.
+Swagger: A tool used for automated documentation and testing of the API.
 
-AutoMapper: Nesneler arasında veri transferi için kullanılan araç (DTO - Data Transfer Object ile model dönüşümü).
+AutoMapper: A tool used for data transfer between objects (model transformation using DTO - Data Transfer Object).
 
-Proje Özellikleri
-Pokemon Yönetimi:
+#### Project Features
+Pokemon Management:
 
-Pokemon'lar eklenebilir, güncellenebilir, silinebilir ve listelenebilir.
+Pokemons can be added, updated, deleted, and listed.
 
-Pokemon'lara ait kategoriler ve incelemelerle ilişkiler kurulabilir.
+Relationships can be established with categories and reviews of Pokemon.
 
-Kategori Yönetimi:
+Category Management:
 
-Pokemon'lar için kategoriler eklenebilir ve güncellenebilir.
+Categories can be added and updated for Pokemon.
 
-Kategorilerle ilgili CRUD işlemleri sağlanır.
+CRUD operations can be performed for categories.
 
-İnceleme Yönetimi:
+#### Review Management:
 
-Pokemon'lar için kullanıcılar tarafından yapılmış yorumlar ve değerlendirmeler eklenebilir.
+User-made comments and ratings can be added to Pokemon.
 
-İncelemelere dair başlık, yorum ve puan gibi veriler yönetilebilir.
+Review data such as title, comment, and score can be managed.
 
-Sahip Yönetimi:
+#### Owner Management:
 
-Her Pokemon'un sahibi belirli bir ülke ve kullanıcıya bağlanabilir.
+Each Pokemon's owner can be linked to a specific country and user.
 
-Sahip bilgileri yönetilebilir ve ilgili Pokemon'lar listelenebilir.
+Owner information can be managed, and related Pokemon can be listed.
 
-API Testi ve Dokümantasyonu:
+#### API Testing and Documentation:
 
-Swagger kullanılarak API'nin kolayca test edilmesi sağlanmıştır. Swagger UI üzerinden API uç noktaları test edilebilir.
+Swagger allows for easy API testing. API endpoints can be tested through the Swagger UI.
 
-Kullanıcı Yönergeleri
-API'nin Başlatılması:
-Proje, ASP.NET Core üzerinde çalıştırılabilir. Başlangıç için uygulamayı Visual Studio veya .NET CLI üzerinden çalıştırabilirsiniz.
+#### User Instructions
+Initializing the API:
+The project can be run on ASP.NET Core. To get started, you can run the application from Visual Studio or the .NET CLI.
 
-Veritabanı Yapılandırması:
-Entity Framework Core kullanılarak veritabanı işlemleri gerçekleştirilir. Veritabanını güncellemek için dotnet ef database update komutunu kullanarak migrasyonları uygulayabilirsiniz.
+#### Database Configuration:
+Database operations are performed using Entity Framework Core. You can apply migrations using the dotnet ef database update command to update the database.
 
-API Testi:
-API'yi test etmek için Swagger UI'yi kullanabilirsiniz. Swagger, tüm uç noktaları (endpoints) görsel olarak sunarak her birini test etmenizi sağlar.
+API Testing:
+You can use the Swagger UI to test the API. Swagger visually presents all endpoints, allowing you to test each one.
 
-Kullanılan Teknolojiler
-ASP.NET Core: Web API'yi geliştirmek için kullanılan ana framework.
+#### Technologies Used
+ASP.NET Core: The main framework used for web API development.
 
-Entity Framework Core: Veritabanı işlemleri için ORM (Object Relational Mapping) aracı.
+Entity Framework Core: An ORM (Object Relational Mapping) tool for database operations.
 
-Swagger: API dokümantasyonu ve test için kullanıldı.
-
+Swagger: Used for API documentation and testing.
