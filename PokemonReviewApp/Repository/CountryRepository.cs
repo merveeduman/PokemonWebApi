@@ -10,22 +10,25 @@ namespace PokemonReviewApp.Repository
         private readonly DataContext _context;
         private readonly IMapper _mapper;
 
-        public CountryRepository(DataContext context, IMapper mapper) 
+        public CountryRepository(DataContext context, IMapper mapper)
         {
             _context = context;
-            _mapper = mapper;       
-
-        }       
-
-
+            _mapper = mapper;
+        }
         public bool CountryExists(int id)
         {
-          return _context.Countries.Any(c=> c.Id== id);
+            return _context.Countries.Any(c => c.Id == id);
         }
 
         public bool CreateCountry(Country country)
         {
             _context.Add(country);
+            return Save();
+        }
+
+        public bool DeleteCountry(Country country)
+        {
+            _context.Remove(country);
             return Save();
         }
 
@@ -44,7 +47,7 @@ namespace PokemonReviewApp.Repository
             return _context.Owners.Where(o => o.Id == ownerId).Select(c => c.Country).FirstOrDefault();
         }
 
-        public ICollection<Owner> GetOwnersFromCountry(int countryId)
+        public ICollection<Owner> GetOwnersFromACountry(int countryId)
         {
             return _context.Owners.Where(c => c.Country.Id == countryId).ToList();
         }

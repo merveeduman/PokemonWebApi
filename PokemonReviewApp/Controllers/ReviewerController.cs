@@ -34,7 +34,7 @@ namespace PokemonReviewApp.Controllers
         [HttpGet("{reviewerId}")]
         [ProducesResponseType(200, Type = typeof(Reviewer))]
         [ProducesResponseType(400)]
-        public IActionResult GetReviewer(int reviewerId)
+        public IActionResult GetPokemon(int reviewerId)
         {
             if (!_reviewerRepository.ReviewerExists(reviewerId))
                 return NotFound();
@@ -61,6 +61,7 @@ namespace PokemonReviewApp.Controllers
 
             return Ok(reviews);
         }
+
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -92,6 +93,7 @@ namespace PokemonReviewApp.Controllers
 
             return Ok("Successfully created");
         }
+
         [HttpPut("{reviewerId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
@@ -121,5 +123,29 @@ namespace PokemonReviewApp.Controllers
             return NoContent();
         }
 
+
+        [HttpDelete("{reviewerId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public IActionResult DeleteReviewer(int reviewerId)
+        {
+            if (!_reviewerRepository.ReviewerExists(reviewerId))
+            {
+                return NotFound();
+            }
+
+            var reviewerToDelete = _reviewerRepository.GetReviewer(reviewerId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.DeleteReviewer(reviewerToDelete))
+            {
+                ModelState.AddModelError("", "Something went wrong deleting reviewer");
+            }
+
+            return NoContent();
+        }
     }
 }
