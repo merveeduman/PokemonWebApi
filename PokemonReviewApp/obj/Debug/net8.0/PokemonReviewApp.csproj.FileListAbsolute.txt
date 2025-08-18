@@ -165,10 +165,13 @@ C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\staticwebassets.build.json.cache
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\PokemonR.12569093.Up2Date
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\PokemonReviewApp.dll
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\refint\PokemonReviewApp.dll
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\PokemonReviewApp.pdb
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\PokemonReviewApp.genruntimeconfig.cache
 C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\ref\PokemonReviewApp.dll
+C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\bin\Debug\net8.0\BCrypt.Net-Next.dll
+C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\bin\Debug\net8.0\Microsoft.Identity.Abstractions.dll
+C:\Users\yazilim\source\repos\PokemonReviewApp\PokemonReviewApp\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PokemonReviewApp.Data;
+using PokemonReviewApp.Controllers.Data;
+
 
 #nullable disable
 
@@ -170,7 +171,7 @@ namespace PokemonReviewApp.Migrations
 
                     b.HasIndex("ReviewerId");
 
-                    b.ToTable("Rewviews");
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("PokemonReviewApp.Reviewer", b =>

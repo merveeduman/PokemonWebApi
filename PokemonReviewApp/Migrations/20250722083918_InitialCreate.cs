@@ -112,7 +112,7 @@ namespace PokemonReviewApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rewviews",
+                name: "Reviews",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -125,15 +125,15 @@ namespace PokemonReviewApp.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rewviews", x => x.Id);
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Rewviews_Pokemon_PokemonId",
+                        name: "FK_Reviews_Pokemon_PokemonId",
                         column: x => x.PokemonId,
                         principalTable: "Pokemon",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Rewviews_Reviewers_ReviewerId",
+                        name: "FK_Reviews_Reviewers_ReviewerId",
                         column: x => x.ReviewerId,
                         principalTable: "Reviewers",
                         principalColumn: "Id",
@@ -180,13 +180,13 @@ namespace PokemonReviewApp.Migrations
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rewviews_PokemonId",
-                table: "Rewviews",
+                name: "IX_Reviews_PokemonId",
+                table: "Reviews",
                 column: "PokemonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rewviews_ReviewerId",
-                table: "Rewviews",
+                name: "IX_Reviews_ReviewerId",
+                table: "Reviews",
                 column: "ReviewerId");
         }
 
@@ -200,7 +200,7 @@ namespace PokemonReviewApp.Migrations
                 name: "PokemonOwners");
 
             migrationBuilder.DropTable(
-                name: "Rewviews");
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "Categories");
