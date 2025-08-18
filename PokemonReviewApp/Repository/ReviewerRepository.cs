@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp.Data;
+using PokemonReviewApp.Controllers.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 
@@ -23,22 +23,26 @@ namespace PokemonReviewApp.Repository
             return Save();
         }
 
-        public bool DeleteReviewer(Reviewer reviewer)
+     /*   public bool DeleteReviewer(Reviewer reviewer)
         {
             _context.Remove(reviewer);
             return Save();
         }
-
+     */
         public Reviewer GetReviewer(int reviewerId)
         {
             return _context.Reviewers.Where(r => r.Id == reviewerId).Include(e => e.Reviews).FirstOrDefault();
         }
 
+        /*   public ICollection<Reviewer> GetReviewers()
+           {
+               return _context.Reviewers.ToList();
+           }
+        */
         public ICollection<Reviewer> GetReviewers()
         {
-            return _context.Reviewers.ToList();
+            return _context.Reviewers.Where(p => !p.IsDeleted).OrderBy(p => p.Id).ToList();
         }
-
         public ICollection<Review> GetReviewsByReviewer(int reviewerId)
         {
             return _context.Reviews.Where(r => r.Reviewer.Id == reviewerId).ToList();
@@ -58,6 +62,16 @@ namespace PokemonReviewApp.Repository
         public bool UpdateReviewer(Reviewer reviewer)
         {
             _context.Update(reviewer);
+            return Save();
+        }
+        public bool SoftDeleteReviewer(int id)
+        {
+            var reviewer = GetReviewer(id);
+            if (reviewer == null) return false;
+
+            reviewer.IsDeleted = true;
+            _context.Update(reviewer);
+
             return Save();
         }
     }

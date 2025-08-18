@@ -8,5 +8,7 @@
         public int Rating { get; set; }
         public Reviewer Reviewer { get; set; }
         public Pokemon Pokemon { get; set; }
+
+        public bool IsDeleted { get; set; } = false;   //  soft delete için ekledim
     }
 }

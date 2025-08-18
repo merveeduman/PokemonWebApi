@@ -1,4 +1,5 @@
-﻿using PokemonReviewApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Controllers.Data;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
@@ -14,31 +15,45 @@ namespace PokemonReviewApp.Repository
             _context = context;
         }
 
-        public bool CreatePokemon(int ownerId, int categoryId, Pokemon pokemon)
+        public bool CreatePokemon(int ownerId, int categoryId, int foodId, Pokemon pokemon)
         {
-            var pokemonOwnerEntity = _context.Owners.Where(a => a.Id == ownerId).FirstOrDefault();
-            var category = _context.Categories.Where(a => a.Id == categoryId).FirstOrDefault();
+            var pokemonOwnerEntity = _context.Owners.FirstOrDefault(o => o.Id == ownerId);
+            var category = _context.Categories.FirstOrDefault(c => c.Id == categoryId);
+            var food = _context.Foods.FirstOrDefault(f => f.Id == foodId); // Yeni satır
 
+            if (pokemonOwnerEntity == null || category == null || food == null)
+                return false;
+
+            // Pokemon-Owner ilişkisi
             var pokemonOwner = new PokemonOwner()
             {
                 Owner = pokemonOwnerEntity,
                 Pokemon = pokemon,
             };
-
             _context.Add(pokemonOwner);
 
+            // Pokemon-Category ilişkisi
             var pokemonCategory = new PokemonCategory()
             {
                 Category = category,
                 Pokemon = pokemon,
             };
-
             _context.Add(pokemonCategory);
 
+            // Pokemon-Food ilişkisi (yeni eklendi)
+            var pokemonFood = new PokemonFood()
+            {
+                Food = food,
+                Pokemon = pokemon,
+            };
+            _context.Add(pokemonFood);
+
+            // Pokemon'u ekle
             _context.Add(pokemon);
 
             return Save();
         }
+
 
         public bool DeletePokemon(Pokemon pokemon)
         {
@@ -66,16 +81,69 @@ namespace PokemonReviewApp.Repository
             return ((decimal)review.Sum(r => r.Rating) / review.Count());
         }
 
-        public ICollection<Pokemon> GetPokemons()
+        /*public ICollection<Pokemon> GetPokemons()
         {
             return _context.Pokemon.OrderBy(p => p.Id).ToList();
+        }
+        */
+
+
+        public ICollection<Owner> GetOwnersOfAPokemon(int pokemonId)
+        {
+            var owners = (from po in _context.PokemonOwners   //ara tablodan başlıyoruz.
+                          join o in _context.Owners
+                              on po.OwnerId equals o.Id  //Owner tablosuna bağlandık.
+
+                          where po.PokemonId == pokemonId  //sadece istediğin Pokémon için filtre.
+                          select o)   //sadece Owner listesi döndürülür.
+                         .ToList();
+
+            return owners;
+        }
+
+
+        public List<Pokemon> GetActivePokemons() //aktif pokemonaların gözükmesini sağlamak için kullanılıyor
+        {
+            return _context.Pokemon.Where(p => !p.IsDeleted).OrderBy(p => p.Id).ToList();
+        }
+
+        public List<Pokemon> GetDeletedPokemons()
+        {
+            return _context.Pokemon.Where(p => p.IsDeleted).OrderBy(p => p.Id).ToList();
         }
 
         public Pokemon GetPokemonTrimToUpper(PokemonDto pokemonCreate)
         {
-            return GetPokemons().Where(c => c.Name.Trim().ToUpper() == pokemonCreate.Name.TrimEnd().ToUpper())
+            return _context.Pokemon
+                .Where(c => c.Name.Trim().ToUpper() == pokemonCreate.Name.Trim().ToUpper())
                 .FirstOrDefault();
         }
+
+
+        public ICollection<Category> GetCategoriesOfPokemon(int pokemonId)
+        {
+            var category = (from pc in _context.PokemonCategories   //ara tablodan başlıyoruz.
+                            join c in _context.Categories
+                                on pc.CategoryId equals c.Id  //category tablosuna bağlandık.
+
+                            where pc.PokemonId == pokemonId  //sadece istediğin Pokémon için filtre.
+                            select c)   //sadece Owner listesi döndürülür.
+                         .ToList();
+
+            return category;
+        }
+        public ICollection<Food> GetFoodsOfPokemon(int pokemonId)
+        {
+            var foods = (from pf in _context.PokemonFood
+                         join f in _context.Foods
+                         on pf.FoodId equals f.Id
+                         where pf.PokemonId == pokemonId
+                         select f)
+                        .ToList();
+
+            return foods;
+        }
+
 
         public bool PokemonExists(int pokeId)
         {
@@ -93,5 +161,19 @@ namespace PokemonReviewApp.Repository
             _context.Update(pokemon);
             return Save();
         }
+        public bool SoftDeletePokemon(int id)
+        {
+            var pokemon = GetPokemon(id);
+            if (pokemon == null) return false;
+
+            pokemon.IsDeleted = true;
+            _context.Update(pokemon);
+
+            return Save();
+        }
+
+
+
+
     }
 }

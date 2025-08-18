@@ -1,4 +1,4 @@
-﻿using PokemonReviewApp.Data;
+﻿using PokemonReviewApp.Controllers.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 
@@ -22,20 +22,24 @@ namespace PokemonReviewApp.Repository
             return Save();
         }
 
-        public bool DeleteCategory(Category category)
+        /*public bool DeleteCategory(Category category)
         {
             _context.Remove(category);
             return Save();
         }
-
+        */
         public ICollection<Category> GetCategories()
         {
-            return _context.Categories.ToList();
+            return _context.Categories.Where(p => !p.IsDeleted).OrderBy(p => p.Id).ToList();
         }
+
 
         public Category GetCategory(int id)
         {
             return _context.Categories.Where(e => e.Id == id).FirstOrDefault();
+
+
+
         }
 
         public ICollection<Pokemon> GetPokemonByCategory(int categoryId)
@@ -52,6 +56,17 @@ namespace PokemonReviewApp.Repository
         public bool UpdateCategory(Category category)
         {
             _context.Update(category);
+            return Save();
+        }
+
+        public bool SoftDeleteCategory(int id)
+        {
+            var category = GetCategory(id);
+            if (category == null) return false;
+
+            category.IsDeleted = true;
+            _context.Update(category);
+
             return Save();
         }
     }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using PokemonReviewApp.Repository;
 
 namespace PokemonReviewApp.Controllers
 {
@@ -132,49 +133,73 @@ namespace PokemonReviewApp.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{reviewId}")]
+        /*   [HttpDelete("{reviewId}")]
+           [ProducesResponseType(400)]
+           [ProducesResponseType(204)]
+           [ProducesResponseType(404)]
+           public IActionResult DeleteReview(int reviewId)
+           {
+               if (!_reviewRepository.ReviewExists(reviewId))
+               {
+                   return NotFound();
+               }
+
+               var reviewToDelete = _reviewRepository.GetReview(reviewId);
+
+               if (!ModelState.IsValid)
+                   return BadRequest(ModelState);
+
+               if (!_reviewRepository.DeleteReview(reviewToDelete))
+               {
+                   ModelState.AddModelError("", "Something went wrong deleting owner");
+               }
+
+               return NoContent();
+           }
+
+
+           // Added missing delete range of reviews by a reviewer **>CK
+           [HttpDelete("/DeleteReviewsByReviewer/{reviewerId}")]
+           [ProducesResponseType(400)]
+           [ProducesResponseType(204)]
+           [ProducesResponseType(404)]
+           public IActionResult DeleteReviewsByReviewer(int reviewerId)
+           {
+               if (!_reviewerRepository.ReviewerExists(reviewerId))
+                   return NotFound();
+
+               var reviewsToDelete = _reviewerRepository.GetReviewsByReviewer(reviewerId).ToList();
+               if (!ModelState.IsValid)
+                   return BadRequest();
+
+               if (!_reviewRepository.DeleteReviews(reviewsToDelete))
+               {
+                   ModelState.AddModelError("", "error deleting reviews");
+                   return StatusCode(500, ModelState);
+               }
+               return NoContent();
+           }
+        */
+        [HttpDelete("soft/{reviewerId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteReview(int reviewId)
+        public IActionResult SoftDeleteCategory(int reviewerId)
         {
-            if (!_reviewRepository.ReviewExists(reviewId))
+            if (!_reviewRepository.ReviewExists(reviewerId))
             {
                 return NotFound();
             }
-
-            var reviewToDelete = _reviewRepository.GetReview(reviewId);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!_reviewRepository.DeleteReview(reviewToDelete))
+            if (!_reviewRepository.SoftDeleteReview(reviewerId))
             {
-                ModelState.AddModelError("", "Something went wrong deleting owner");
-            }
-
-            return NoContent();
-        }
-
-        // Added missing delete range of reviews by a reviewer **>CK
-        [HttpDelete("/DeleteReviewsByReviewer/{reviewerId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        public IActionResult DeleteReviewsByReviewer(int reviewerId)
-        {
-            if (!_reviewerRepository.ReviewerExists(reviewerId))
-                return NotFound();
-
-            var reviewsToDelete = _reviewerRepository.GetReviewsByReviewer(reviewerId).ToList();
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            if (!_reviewRepository.DeleteReviews(reviewsToDelete))
-            {
-                ModelState.AddModelError("", "error deleting reviews");
+                ModelState.AddModelError("", "Something went wrong during soft delete");
                 return StatusCode(500, ModelState);
             }
+
             return NoContent();
         }
 

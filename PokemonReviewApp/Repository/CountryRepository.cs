@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using PokemonReviewApp.Data;
+using PokemonReviewApp.Controllers.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 
@@ -26,15 +26,21 @@ namespace PokemonReviewApp.Repository
             return Save();
         }
 
-        public bool DeleteCountry(Country country)
+        /*public bool DeleteCountry(Country country)
         {
             _context.Remove(country);
             return Save();
         }
+        */
+        /*  public ICollection<Country> GetCountries()
+          {
+              return _context.Countries.ToList();
+          }
+          */
 
         public ICollection<Country> GetCountries()
         {
-            return _context.Countries.ToList();
+            return _context.Countries.Where(c => !c.IsDeleted).OrderBy(c => c.Id).ToList();
         }
 
         public Country GetCountry(int id)
@@ -61,6 +67,16 @@ namespace PokemonReviewApp.Repository
         public bool UpdateCountry(Country country)
         {
             _context.Update(country);
+            return Save();
+        }
+        public bool SoftDeleteCountry(int id)
+        {
+            var country = GetCountry(id);
+            if (country == null) return false;
+
+            country.IsDeleted = true;
+            _context.Update(country);
+
             return Save();
         }
     }
