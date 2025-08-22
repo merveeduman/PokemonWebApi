@@ -1,18 +1,20 @@
-﻿using PokemonReviewApp.Controllers.Data;
+﻿using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace PokemonReviewApp.Repository
 {
     public class RolePermissionRepository : IRolePermissionsRepository
     {
         private readonly DataContext _context;
-
-        public RolePermissionRepository(DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public RolePermissionRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public ICollection<RolePermission> GetRolePermissions()
@@ -49,7 +51,11 @@ namespace PokemonReviewApp.Repository
                         Permission = p
                     }).FirstOrDefault();
         }
-
+        private int GetUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
+        }
         public bool RolePermissionExists(int roleId, int permissionId)
         {
             return _context.RolePermission.Any(rp => rp.RoleId == roleId && rp.PermissionId == permissionId);
@@ -57,7 +63,10 @@ namespace PokemonReviewApp.Repository
 
         public bool CreateRolePermission(RolePermission rolePermission)
         {
-            _context.RolePermission.Add(rolePermission);
+            rolePermission.CreatedUserId = GetUserId();
+            rolePermission.CreatedUserDateTime = DateTime.Now;
+
+            _context.Add(rolePermission);
             return Save();
         }
 

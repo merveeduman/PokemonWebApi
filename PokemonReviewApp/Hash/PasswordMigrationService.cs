@@ -1,4 +1,4 @@
-﻿using PokemonReviewApp.Controllers.Data;
+﻿using PokemonReviewApp.Data;
 
 namespace PokemonReviewApp.Hash
 {

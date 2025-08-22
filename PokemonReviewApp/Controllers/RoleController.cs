@@ -26,7 +26,7 @@ namespace PokemonReviewApp.Controllers
         // GET: api/Role
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<RoleDto>))]
-        [Authorize(Policy = "Permission:Okufffma İzni,Yazma İzni")]
+        
 
         public IActionResult GetRoles()
         {

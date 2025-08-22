@@ -3,7 +3,7 @@
 namespace PokemonReviewApp.Models
 {
     [Table("FoodType")]
-    public class FoodType
+    public class FoodType : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

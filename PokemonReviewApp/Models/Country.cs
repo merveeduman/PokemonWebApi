@@ -1,6 +1,6 @@
 ﻿namespace PokemonReviewApp.Models
 {
-    public class Country
+    public class Country : BaseEntity
     {
 
         public int Id { get; set; }

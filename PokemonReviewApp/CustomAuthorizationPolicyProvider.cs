@@ -7,7 +7,6 @@ namespace PokemonReviewApp
     public class CustomAuthorizationPolicyProvider : IAuthorizationPolicyProvider
     {
         private const string POLICY_PREFIX = "Permission:";
-
         public DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
 
         public CustomAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options)
@@ -23,17 +22,18 @@ namespace PokemonReviewApp
 
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {
-            if (policyName.StartsWith(POLICY_PREFIX, System.StringComparison.OrdinalIgnoreCase))
+            if (policyName.StartsWith(POLICY_PREFIX, StringComparison.OrdinalIgnoreCase))
             {
-                var permissionName = policyName.Substring(POLICY_PREFIX.Length);
+                var permissionPart = policyName.Substring(POLICY_PREFIX.Length);
+                var permissions = permissionPart.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
                 var policy = new AuthorizationPolicyBuilder();
-                policy.AddRequirements(new PermissionRequirement(permissionName));
-
+                policy.AddRequirements(new PermissionRequirement(permissions));
                 return Task.FromResult(policy.Build());
             }
 
             return FallbackPolicyProvider.GetPolicyAsync(policyName);
         }
     }
+
 }

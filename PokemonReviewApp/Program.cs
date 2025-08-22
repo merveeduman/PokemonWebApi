@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PokemonReviewApp;
-using PokemonReviewApp.Controllers.Data;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Hash;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Repository;
@@ -38,7 +38,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Authorization'a Custom Policy Provider ve Handler ekleniyor
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, CustomAuthorizationPolicyProvider>();
-builder.Services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 builder.Services.AddAuthorization();
 
@@ -74,6 +74,8 @@ builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IRolePermissionsRepository, RolePermissionRepository>();
 builder.Services.AddScoped<PasswordMigrationService>();
 
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddHttpContextAccessor();
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -106,12 +108,6 @@ builder.Services.AddSwaggerGen(c =>
 );
 
 
-
-
-
-
-
-
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -132,8 +128,6 @@ void SeedData(IHost app)
         service.SeedDataContext();
     }
 }
-
-
 
 
 // Configure the HTTP request pipeline.

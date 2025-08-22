@@ -1,23 +1,34 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp.Controllers.Data;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PokemonReviewApp.Repository
 {
     public class OwnerRepository : IOwnerRepository
     {
         private readonly DataContext _context;
-
-        public OwnerRepository(DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public OwnerRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public bool CreateOwner(Owner owner)
         {
+            owner.CreatedUserId = GetUserId();
+            owner.CreatedUserDateTime = DateTime.Now;
+
             _context.Add(owner);
             return Save();
+        }
+        private int GetUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
         }
 
         /* public bool DeleteOwner(Owner owner)

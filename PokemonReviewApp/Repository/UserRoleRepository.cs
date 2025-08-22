@@ -1,7 +1,8 @@
-﻿using PokemonReviewApp.Controllers.Data;
+﻿using PokemonReviewApp.Data;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Security.Claims;
 
 
 namespace PokemonReviewApp.Repository
@@ -9,10 +10,11 @@ namespace PokemonReviewApp.Repository
     public class UserRoleRepository : IUserRoleRepository
     {
         private readonly DataContext _context;
-
-        public UserRoleRepository(DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserRoleRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public bool AssignRoleToUser(int userId, int roleId)
@@ -29,11 +31,46 @@ namespace PokemonReviewApp.Repository
             _context.UserRoles.Add(new UserRole
             {
                 UserId = userId,
-                RoleId = roleId
+                RoleId = roleId,
+                CreatedUserId= userId,
+                CreatedUserDateTime = DateTime.UtcNow,
             });
 
             return Save();
         }
+
+        private int GetUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
+        }
+        public bool CreateUserRole(UserRoleDto dto)
+        {
+            // Giriş yapan kullanıcı ID'sini al
+            int createdByUserId = GetUserId();
+            if (createdByUserId == 0) return false;
+
+            var exists = _context.UserRoles.Any(ur =>
+                ur.UserId == dto.UserId &&
+                ur.RoleId == dto.RoleId &&
+                !ur.IsDeleted);
+
+            if (exists)
+                return false;
+
+            var userRole = new UserRole
+            {
+                UserId = dto.UserId,
+                RoleId = dto.RoleId,
+                CreatedUserId = createdByUserId,
+                CreatedUserDateTime = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            _context.UserRoles.Add(userRole);
+            return Save();
+        }
+
 
 
         public ICollection<UserRole> GetAllUserRoles()

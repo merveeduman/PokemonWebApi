@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -65,6 +66,7 @@ namespace PokemonReviewApp.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [Authorize(Policy = "Permission:CountryEkleme")]
         public IActionResult CreateCountry([FromBody] CountryDto countryCreate)
         {
             if (countryCreate == null)
@@ -85,13 +87,14 @@ namespace PokemonReviewApp.Controllers
 
             var countryMap = _mapper.Map<Country>(countryCreate);
 
+       
+
             if (!_countryRepository.CreateCountry(countryMap))
             {
-                ModelState.AddModelError("", "Something went wrong while savin");
+                ModelState.AddModelError("", "Something went wrong while saving");
                 return StatusCode(500, ModelState);
             }
-
-            return Ok("Successfully created");
+            return Ok("Country create succesfully");
         }
 
         [HttpPut("{countryId}")]

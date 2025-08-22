@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using PokemonReviewApp.Controllers.Data;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Security.Claims;
 
 namespace PokemonReviewApp.Repository
 {
@@ -9,15 +10,19 @@ namespace PokemonReviewApp.Repository
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-
-        public ReviewRepository(DataContext context, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ReviewRepository(DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public bool CreateReview(Review review)
         {
+            review.CreatedUserId = GetUserId();
+            review.CreatedUserDateTime = DateTime.Now;
+
             _context.Add(review);
             return Save();
         }
@@ -38,12 +43,17 @@ namespace PokemonReviewApp.Repository
         {
             return _context.Reviews.Where(r => r.Id == reviewId).FirstOrDefault();
         }
-
-      /*  public ICollection<Review> GetReviews()
+        private int GetUserId()
         {
-            return _context.Reviews.ToList();
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
         }
-      */
+
+        /*  public ICollection<Review> GetReviews()
+          {
+              return _context.Reviews.ToList();
+          }
+        */
         public ICollection<Review> GetReviews()
         {
             return _context.Reviews.Where(p => !p.IsDeleted).OrderBy(p => p.Id).ToList();

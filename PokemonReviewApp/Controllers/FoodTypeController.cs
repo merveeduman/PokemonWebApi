@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -46,6 +47,7 @@ namespace PokemonReviewApp.Controllers
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
+        
         public IActionResult CreateFoodType([FromBody] FoodTypeDto foodTypeCreate)
         {
             if (foodTypeCreate == null)
@@ -59,7 +61,7 @@ namespace PokemonReviewApp.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return CreatedAtAction(nameof(GetFoodType), new { foodTypeId = foodTypeMap.Id }, foodTypeMap);
+            return StatusCode(201, true);
         }
 
         [HttpPut("{foodTypeId}")]

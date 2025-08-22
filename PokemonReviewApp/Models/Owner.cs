@@ -2,7 +2,7 @@
 
 namespace PokemonReviewApp.Models
 {
-    public class Owner
+    public class Owner : BaseEntity
     {
 
         public int Id { get; set; }

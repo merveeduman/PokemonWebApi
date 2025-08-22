@@ -60,7 +60,7 @@ namespace PokemonReviewApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return Ok(reviews);
+            return Ok(true);
         }
 
         [HttpPost]

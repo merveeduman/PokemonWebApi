@@ -1,19 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp.Controllers.Data;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics.Metrics;
+using System.Security.Claims;
+
 
 namespace PokemonReviewApp.Repository
 {
     public class FoodRepository : IFoodRepository
     {
         private readonly DataContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FoodRepository(DataContext context)
+        public FoodRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+         
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public Food GetFood(int id)
@@ -21,6 +26,11 @@ namespace PokemonReviewApp.Repository
             return _context.Foods
                 .Include(f => f.FoodType)
                 .FirstOrDefault(f => f.Id == id);
+        }
+        private int GetUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
         }
 
         public Food GetFoodByName(string name)
@@ -37,6 +47,9 @@ namespace PokemonReviewApp.Repository
 
         public bool CreateFood(Food food)
         {
+            food.CreatedUserId = GetUserId();
+            food.CreatedUserDateTime = DateTime.Now;
+
             _context.Add(food);
             return Save();
         }

@@ -1,34 +1,48 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp.Controllers.Data;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Security.Claims;
 
 namespace PokemonReviewApp.Repository
 {
     public class PokemonRepository : IPokemonRepository
     {
         private readonly DataContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PokemonRepository(DataContext context)
+        public PokemonRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
+        private int GetUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
+        }
         public bool CreatePokemon(int ownerId, int categoryId, int foodId, Pokemon pokemon)
         {
             var pokemonOwnerEntity = _context.Owners.FirstOrDefault(o => o.Id == ownerId);
             var category = _context.Categories.FirstOrDefault(c => c.Id == categoryId);
-            var food = _context.Foods.FirstOrDefault(f => f.Id == foodId); // Yeni satır
+            var food = _context.Foods.FirstOrDefault(f => f.Id == foodId);
 
             if (pokemonOwnerEntity == null || category == null || food == null)
                 return false;
+
+
+            pokemon.CreatedUserId = GetUserId();
+            pokemon.CreatedUserDateTime = DateTime.Now;
 
             // Pokemon-Owner ilişkisi
             var pokemonOwner = new PokemonOwner()
             {
                 Owner = pokemonOwnerEntity,
                 Pokemon = pokemon,
+                CreatedUserId = GetUserId(),
+                CreatedUserDateTime = DateTime.Now
             };
             _context.Add(pokemonOwner);
 
@@ -37,22 +51,28 @@ namespace PokemonReviewApp.Repository
             {
                 Category = category,
                 Pokemon = pokemon,
+                CreatedUserId = GetUserId(),
+                CreatedUserDateTime = DateTime.Now
             };
             _context.Add(pokemonCategory);
 
-            // Pokemon-Food ilişkisi (yeni eklendi)
-            var pokemonFood = new PokemonFood()
+            // Pokemon-Food ilişkisi
+            var pokemonFood = new PokemonFood
             {
-                Food = food,
                 Pokemon = pokemon,
+                Food = food,
+                CreatedUserId = GetUserId(),                       // Kullanıcı ID'sini al
+                CreatedUserDateTime = DateTime.UtcNow              // Şu anki zamanı ver
             };
             _context.Add(pokemonFood);
+
 
             // Pokemon'u ekle
             _context.Add(pokemon);
 
             return Save();
         }
+
 
 
         public bool DeletePokemon(Pokemon pokemon)

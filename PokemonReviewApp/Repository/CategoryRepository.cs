@@ -1,23 +1,35 @@
-﻿using PokemonReviewApp.Controllers.Data;
+﻿using PokemonReviewApp.Data;
+using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Security.Claims;
 
 namespace PokemonReviewApp.Repository
 {
     public class CategoryRepository : ICategoryRepository
     {
         private DataContext _context;
-        public CategoryRepository(DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CategoryRepository(DataContext context, IHttpContextAccessor httpContextAccessor )
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
         public bool CategoryExists(int id)
         {
             return _context.Categories.Any(c => c.Id == id);
         }
+        private int GetUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
+        }
 
         public bool CreateCategory(Category category)
         {
+            category.CreatedUserId = GetUserId();
+            category.CreatedUserDateTime = DateTime.Now;
+
             _context.Add(category);
             return Save();
         }
@@ -53,11 +65,16 @@ namespace PokemonReviewApp.Repository
             return saved > 0 ? true : false;
         }
 
-        public bool UpdateCategory(Category category)
+        public bool UpdateCategory(CategoryDto dto)
         {
-            _context.Update(category);
+            var category = _context.Categories.FirstOrDefault(c => c.Id == dto.Id);
+            if (category == null) return false;
+
+            category.Name = dto.Name;
+
             return Save();
         }
+
 
         public bool SoftDeleteCategory(int id)
         {

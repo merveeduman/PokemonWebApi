@@ -1,6 +1,6 @@
 ﻿namespace PokemonReviewApp.Models
 {
-    public class Food
+    public class Food : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

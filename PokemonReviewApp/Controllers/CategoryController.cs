@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
@@ -65,6 +66,8 @@ namespace PokemonReviewApp.Controllers
         [HttpPost]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [Authorize(Policy = "Permission:Category Ekleme")]
+
         public IActionResult CreateCategory([FromBody] CategoryDto categoryCreate)
         {
             if (categoryCreate == null)
@@ -84,44 +87,41 @@ namespace PokemonReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var categoryMap = _mapper.Map<Category>(categoryCreate);
+   
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdStr, out int userId))
+                return Unauthorized("Kullanıcı ID'si alınamadı");
+
+            categoryMap.CreatedUserId = userId;
+            categoryMap.CreatedUserDateTime = DateTime.Now;
 
             if (!_categoryRepository.CreateCategory(categoryMap))
             {
-                ModelState.AddModelError("", "Something went wrong while savin");
+                ModelState.AddModelError("", "Something went wrong while saving");
                 return StatusCode(500, ModelState);
             }
 
             return Ok("Successfully created");
         }
 
+
         [HttpPut("{categoryId}")]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
         public IActionResult UpdateCategory(int categoryId, [FromBody] CategoryDto updatedCategory)
         {
-            if (updatedCategory == null)
-                return BadRequest(ModelState);
-
-            if (categoryId != updatedCategory.Id)
-                return BadRequest(ModelState);
+            if (updatedCategory == null || categoryId != updatedCategory.Id)
+                return BadRequest();
 
             if (!_categoryRepository.CategoryExists(categoryId))
                 return NotFound();
 
-            if (!ModelState.IsValid)
-                return BadRequest();
+            var result = _categoryRepository.UpdateCategory(updatedCategory);
 
-            var categoryMap = _mapper.Map<Category>(updatedCategory);
-
-            if (!_categoryRepository.UpdateCategory(categoryMap))
-            {
-                ModelState.AddModelError("", "Something went wrong updating category");
-                return StatusCode(500, ModelState);
-            }
+            if (!result)
+                return StatusCode(500, "Something went wrong updating category");
 
             return NoContent();
         }
+
 
         /* [HttpDelete("{categoryId}")]
          [ProducesResponseType(400)]

@@ -38,16 +38,11 @@ public class AuthController : ControllerBase
             return Unauthorized("Şifre hatalı");
 
 
-
-
-
-
-       
-
         var claims = new List<Claim>
 {
-      new Claim(ClaimTypes.Name, user.Email)
+    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
 };
+
 
         var addedPermissions = new List<string>();
 
@@ -80,7 +75,7 @@ public class AuthController : ControllerBase
         }
 
 
-        
+
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtConfig:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);

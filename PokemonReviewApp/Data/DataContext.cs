@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Models;
 
-namespace PokemonReviewApp.Controllers.Data
+namespace PokemonReviewApp.Data
 {
     public class DataContext : DbContext
     {

@@ -1,19 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp.Controllers.Data;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace PokemonReviewApp.Repository
 {
     public class PokemonFoodRepository : IPokemonFoodRepository
     {
         private readonly DataContext _context;
-
-        public PokemonFoodRepository(DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public PokemonFoodRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public ICollection<PokemonFood> GetPokemonFoods()
@@ -52,6 +54,11 @@ namespace PokemonReviewApp.Repository
         {
             return _context.PokemonFood.Any(pf => pf.PokemonId == pokemonId && pf.FoodId == foodId);
         }
+        private int GetUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
+        }
 
         public bool CreatePokemonFood(PokemonFood pokemonFood)
         {
@@ -64,7 +71,7 @@ namespace PokemonReviewApp.Repository
                 return false; // Controller'da 404 döneceğiz
             }
 
-            // Önce soft delete ile işaretlenmiş kaydı bulmaya çalış
+            // Önce soft delete ile işaretlenmiş kaydı bul
             var existingSoftDeleted = _context.PokemonFood
                 .FirstOrDefault(x => x.PokemonId == pokemonFood.PokemonId &&
                                      x.FoodId == pokemonFood.FoodId &&
@@ -72,14 +79,16 @@ namespace PokemonReviewApp.Repository
 
             if (existingSoftDeleted != null)
             {
-                // Eğer soft delete edilmiş kayıt varsa, onu geri döndür
+                // Soft delete edilmiş kaydı geri getir
                 existingSoftDeleted.IsDeleted = false;
+                existingSoftDeleted.CreatedUserId = GetUserId(); // 🔥 KULLANICI EKLENDİ
+                existingSoftDeleted.CreatedUserDateTime = DateTime.Now; // 🔥 ZAMAN EKLENDİ
+
                 _context.PokemonFood.Update(existingSoftDeleted);
-                _context.SaveChanges();
-                return true;
+                return Save(); // Save() metodunu kullan
             }
 
-            // Soft delete edilmemiş kayıt var mı kontrol et (yine aynı kayıt)
+            // Zaten var olan aktif kayıt varsa, ekleme
             bool exists = _context.PokemonFood
                 .Any(x => x.PokemonId == pokemonFood.PokemonId &&
                           x.FoodId == pokemonFood.FoodId &&
@@ -87,13 +96,17 @@ namespace PokemonReviewApp.Repository
 
             if (exists)
             {
-                return false; // Controller'da 409 Conflict döneceğiz
+                return false; // 409 Conflict
             }
 
-            // Yeni kayıt ekle
+            // Yeni kayıt oluştur
+            pokemonFood.CreatedUserId = GetUserId();           
+            pokemonFood.CreatedUserDateTime = DateTime.Now;    
+
             _context.Add(pokemonFood);
-            return _context.SaveChanges() > 0;
+            return Save(); // Save() metodunu kullan
         }
+
 
         public bool PokemonExists(int pokemonId)
         {

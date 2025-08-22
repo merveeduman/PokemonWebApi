@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp.Controllers.Data;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Hash;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;

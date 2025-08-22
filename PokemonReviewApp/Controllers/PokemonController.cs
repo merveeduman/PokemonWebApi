@@ -68,41 +68,41 @@ namespace PokemonReviewApp.Controllers
         }
 
         [HttpPost]
-[ProducesResponseType(204)]
-[ProducesResponseType(400)]
-public IActionResult CreatePokemon(
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult CreatePokemon(
     [FromQuery] int ownerId,
     [FromQuery] int catId,
     [FromQuery] int foodId, // Yeni eklendi
     [FromBody] PokemonDto pokemonCreate)
-{
-    if (pokemonCreate == null)
-        return BadRequest(ModelState);
+        {
+            if (pokemonCreate == null)
+                return BadRequest(ModelState);
 
-    var pokemons = _pokemonRepository.GetPokemonTrimToUpper(pokemonCreate);
+            var pokemons = _pokemonRepository.GetPokemonTrimToUpper(pokemonCreate);
 
-    if (pokemons != null)
+            if (pokemons != null)
 
 
-    {
-        ModelState.AddModelError("", "Pokemon already exists");
-        return StatusCode(422, ModelState);
-    }
+            {
+                ModelState.AddModelError("", "Pokemon already exists");
+                return StatusCode(422, ModelState);
+            }
 
-    if (!ModelState.IsValid)
-        return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-    var pokemonMap = _mapper.Map<Pokemon>(pokemonCreate);
+            var pokemonMap = _mapper.Map<Pokemon>(pokemonCreate);
 
-    // Yeni: Food bağlantısı da yapılacaksa repository methodu güncellenmeli
-    if (!_pokemonRepository.CreatePokemon(ownerId, catId, foodId, pokemonMap))
-    {
-        ModelState.AddModelError("", "Something went wrong while saving");
-        return StatusCode(500, ModelState);
-    }
+            // Yeni: Food bağlantısı da yapılacaksa repository methodu güncellenmeli
+            if (!_pokemonRepository.CreatePokemon(ownerId, catId, foodId, pokemonMap))
+            {
+                ModelState.AddModelError("", "Something went wrong while saving");
+                return StatusCode(500, ModelState);
+            }
 
-    return Ok("Successfully created");
-}
+            return Ok("Successfully created");
+        }
 
 
         [HttpPut("{pokeId}")]
@@ -204,10 +204,10 @@ public IActionResult CreatePokemon(
         [HttpGet("{pokemonId}/categories")]
         public IActionResult GetCategoriesOfPokemon(int pokemonId)
         {
-            
+
             var categories = _pokemonRepository.GetCategoriesOfPokemon(pokemonId);
 
-            
+
             var mapped = _mapper.Map<List<CategoryDto>>(categories);
             return Ok(mapped);
         }

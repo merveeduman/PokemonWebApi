@@ -4,12 +4,12 @@ namespace PokemonReviewApp
 {
     public class PermissionRequirement : IAuthorizationRequirement
     {
-        public string Permission { get; }
+        public List<string> Permissions { get; }
 
-
-        public PermissionRequirement(string permission)
+        public PermissionRequirement(IEnumerable<string> permissions)
         {
-            Permission = permission;
+            Permissions = permissions.Select(p => p.Trim()).ToList();
         }
     }
+
 }

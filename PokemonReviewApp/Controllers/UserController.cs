@@ -74,7 +74,8 @@ namespace PokemonReviewApp.Controllers
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public IActionResult CreateUser([FromBody] UserDto userCreate, [FromQuery] int roleId) // roleId query parametre olarak alınabilir
+        [Authorize(Policy = "Permission:KullanıcıEkleme")]
+        public IActionResult CreateUser([FromBody] UserDto userCreate, [FromQuery] int roleId)
         {
             if (userCreate == null)
                 return BadRequest(ModelState);
@@ -107,9 +108,10 @@ namespace PokemonReviewApp.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            var userDto = _mapper.Map<UserDto>(user);
-            return CreatedAtAction(nameof(GetUser), new { userId = user.Id }, userDto);
+            // Artık UserDto dönmüyoruz, sadece başarılı olduğunu belirtiyoruz
+            return StatusCode(201, true);
         }
+
 
 
 

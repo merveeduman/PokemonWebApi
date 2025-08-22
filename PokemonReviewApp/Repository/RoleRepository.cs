@@ -1,18 +1,26 @@
-﻿using PokemonReviewApp.Controllers.Data;
-using PokemonReviewApp.Interfaces;
+﻿using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
-using System.Collections.Generic;
-using System.Linq;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Data;
 
 namespace PokemonReviewApp.Repository
 {
     public class RoleRepository : IRoleRepository
     {
         private readonly DataContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public RoleRepository(DataContext context)
+        public RoleRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private int GetUserId()
+        {
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
         }
 
         public ICollection<Role> GetRoles()
@@ -26,8 +34,7 @@ namespace PokemonReviewApp.Repository
         public Role GetRoleById(int id)
         {
             return _context.Roles
-                .Where(r => r.Id == id && !r.IsDeleted)
-                .FirstOrDefault();
+                .FirstOrDefault(r => r.Id == id && !r.IsDeleted);
         }
 
         public bool RoleExists(int id)
@@ -37,25 +44,37 @@ namespace PokemonReviewApp.Repository
 
         public bool CreateRole(Role role)
         {
+            role.CreatedUserId = GetUserId();
+            role.CreatedUserDateTime = DateTime.UtcNow;
+            role.IsDeleted = false;
+
             _context.Roles.Add(role);
             return Save();
         }
 
-        public bool UpdateRole(Role role)
+        public bool UpdateRole(Role updatedRole)
         {
-            _context.Roles.Update(role);
+            var existingRole = _context.Roles.FirstOrDefault(r => r.Id == updatedRole.Id && !r.IsDeleted);
+            if (existingRole == null)
+                return false;
+
+            // Güncellenecek alanlar
+            existingRole.Name = updatedRole.Name;
+            existingRole.Description = updatedRole.Description;
+
+
             return Save();
         }
 
         public bool SoftDeleteRole(int roleId)
         {
-            var role = _context.Roles.FirstOrDefault(r => r.Id == roleId);
+            var role = _context.Roles.FirstOrDefault(r => r.Id == roleId && !r.IsDeleted);
             if (role == null) return false;
 
             role.IsDeleted = true;
+
             return Save();
         }
-
 
         public bool Save()
         {

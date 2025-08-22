@@ -4,7 +4,7 @@ using PokemonReviewApp.Models;
 using PokemonReviewApp.Dto;
 namespace PokemonReviewApp.Models
 {
-    public class Pokemon
+    public class Pokemon : BaseEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

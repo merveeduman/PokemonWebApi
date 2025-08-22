@@ -1,4 +1,5 @@
-﻿using PokemonReviewApp.Models;
+﻿using PokemonReviewApp.Dto;
+using PokemonReviewApp.Models;
 
 namespace PokemonReviewApp.Interfaces
 {
@@ -9,7 +10,7 @@ namespace PokemonReviewApp.Interfaces
         ICollection<Pokemon> GetPokemonByCategory(int categoryId);
         bool CategoryExists(int id);
         bool CreateCategory(Category category);
-        bool UpdateCategory(Category category);
+        bool UpdateCategory(CategoryDto dto);
         //bool DeleteCategory(Category category);
 
 

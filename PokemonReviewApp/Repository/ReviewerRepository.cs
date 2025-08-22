@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using PokemonReviewApp.Controllers.Data;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Security.Claims;
 
 namespace PokemonReviewApp.Repository
 {
@@ -10,25 +11,34 @@ namespace PokemonReviewApp.Repository
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;
-
-        public ReviewerRepository(DataContext context, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ReviewerRepository(DataContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public bool CreateReviewer(Reviewer reviewer)
         {
+            reviewer.CreatedUserId = GetUserId();
+            reviewer.CreatedUserDateTime = DateTime.Now;
+
             _context.Add(reviewer);
             return Save();
         }
-
-     /*   public bool DeleteReviewer(Reviewer reviewer)
+        private int GetUserId()
         {
-            _context.Remove(reviewer);
-            return Save();
+            var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null ? int.Parse(claim.Value) : 0;
         }
-     */
+
+        /*   public bool DeleteReviewer(Reviewer reviewer)
+           {
+               _context.Remove(reviewer);
+               return Save();
+           }
+        */
         public Reviewer GetReviewer(int reviewerId)
         {
             return _context.Reviewers.Where(r => r.Id == reviewerId).Include(e => e.Reviews).FirstOrDefault();

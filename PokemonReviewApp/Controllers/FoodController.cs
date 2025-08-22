@@ -66,6 +66,7 @@ namespace PokemonReviewApp.Controllers
                 return BadRequest(ModelState);
 
             var foodMap = _mapper.Map<Food>(foodCreate);
+            
 
             if (!_foodRepository.CreateFood(foodMap))
             {

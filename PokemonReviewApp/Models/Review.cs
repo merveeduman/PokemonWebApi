@@ -1,6 +1,6 @@
 ﻿namespace PokemonReviewApp.Models
 {
-    public class Review
+    public class Review : BaseEntity
     {
         public int Id { get; set; }
         public string Title { get; set; }
