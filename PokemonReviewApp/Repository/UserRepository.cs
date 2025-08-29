@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Data;
+using PokemonReviewApp.Dto;
 using PokemonReviewApp.Hash;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
@@ -11,10 +12,12 @@ namespace PokemonReviewApp.Repository
     public class UserRepository : IUserRepository
     {
         private readonly DataContext _context;
+        private readonly IUserRoleRepository _userRoleRepository;
 
-        public UserRepository(DataContext context)
+        public UserRepository(DataContext context, IUserRoleRepository userRoleRepository)
         {
             _context = context;
+            _userRoleRepository = userRoleRepository;
         }
 
         public IEnumerable<User> GetUsers()
@@ -40,9 +43,6 @@ namespace PokemonReviewApp.Repository
                             .ThenInclude(rp => rp.Permission)
                 .FirstOrDefault(u => u.Email == email);
         }
-
-
-
 
         public bool CreateUser(User user)
         {
@@ -87,6 +87,84 @@ namespace PokemonReviewApp.Repository
             return permissions; // izinleri döndür
         }
 
+        public async Task<bool> CreateUserWithLogAsync(User user, int roleId)
+        {
+            // Şifreyi hashle
+            user.Password = HashHelper.ComputeSha512Hash(user.Password);
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // User ekle
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync(); // user.Id atanır
+
+                if (user.Id <= 0)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine("User kaydedilemedi, Id alınamadı.");
+                    return false;
+                }
+
+                // Rol ata
+                var roleAssigned = await _userRoleRepository.CreateUserRoleAsync(new UserRoleDto
+                {
+                    UserId = user.Id,
+                    RoleId = roleId
+                });
+
+                if (!roleAssigned)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine("Role atama başarısız.");
+                    return false;
+                }
+
+
+                if (!roleAssigned)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine("Role atama başarısız.");
+                    return false;
+                }
+
+                // UserLog oluştur
+                var userLog = new UserLog
+                {
+                    UserId =9999999,
+                    Name = user.Name,
+                    Surname = user.Surname,
+                    Email = user.Email,
+                    Password = user.Password,
+                    CreatedDate = DateTime.Now
+                };
+
+                // Validasyon
+                if (string.IsNullOrWhiteSpace(userLog.Name) ||
+                    string.IsNullOrWhiteSpace(userLog.Email) ||
+                    string.IsNullOrWhiteSpace(userLog.Password))
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine("UserLog geçersiz veri içeriyor.");
+                    return false;
+                }
+
+                _context.UserLog.Add(userLog);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                
+                Console.WriteLine("Hata oluştu: " + ex.Message);
+                Console.WriteLine("StackTrace: " + ex.StackTrace);
+
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
 
 
         public bool Save()

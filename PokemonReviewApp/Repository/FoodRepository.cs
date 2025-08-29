@@ -56,9 +56,22 @@ namespace PokemonReviewApp.Repository
 
         public bool UpdateFood(Food food)
         {
-            _context.Update(food);
+            var existing = _context.Foods.FirstOrDefault(c => c.Id == food.Id);
+            if (existing == null) return false;
+
+            // GÜNCELLENECEK ALANLAR
+            existing.Name = food.Name;
+            existing.Price = food.Price;
+            existing.FoodTypeId = food.FoodTypeId;
+
+            // BU ALANLARI KORU
+            existing.CreatedUserId = existing.CreatedUserId;
+            existing.CreatedUserDateTime = existing.CreatedUserDateTime;
+
+            _context.Update(existing);
             return Save();
         }
+
 
         public bool DeleteFood(int id)
         {

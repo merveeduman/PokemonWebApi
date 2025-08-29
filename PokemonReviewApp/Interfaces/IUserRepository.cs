@@ -13,6 +13,8 @@ namespace PokemonReviewApp.Interfaces
         bool CreateUser(User user);
         bool UpdateUser(User user);
         bool SoftDeleteUser(int id);
+        Task<bool> CreateUserWithLogAsync(User user, int roleId);
+
         bool Save();
     }
 }

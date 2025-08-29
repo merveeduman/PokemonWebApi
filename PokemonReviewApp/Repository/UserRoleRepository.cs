@@ -44,32 +44,20 @@ namespace PokemonReviewApp.Repository
             var claim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
             return claim != null ? int.Parse(claim.Value) : 0;
         }
-        public bool CreateUserRole(UserRoleDto dto)
+        public async Task<bool> CreateUserRoleAsync(UserRoleDto dto)
         {
-            // Giriş yapan kullanıcı ID'sini al
-            int createdByUserId = GetUserId();
-            if (createdByUserId == 0) return false;
-
-            var exists = _context.UserRoles.Any(ur =>
-                ur.UserId == dto.UserId &&
-                ur.RoleId == dto.RoleId &&
-                !ur.IsDeleted);
-
-            if (exists)
-                return false;
-
             var userRole = new UserRole
             {
                 UserId = dto.UserId,
                 RoleId = dto.RoleId,
-                CreatedUserId = createdByUserId,
-                CreatedUserDateTime = DateTime.UtcNow,
-                IsDeleted = false
+                IsDeleted = false,
+                CreatedUserDateTime = DateTime.Now,
+                CreatedUserId = GetUserId()
             };
-
             _context.UserRoles.Add(userRole);
-            return Save();
+            return await _context.SaveChangesAsync() > 0;
         }
+
 
 
 

@@ -2,6 +2,7 @@
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Diagnostics.Metrics;
 using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -90,9 +91,21 @@ namespace PokemonReviewApp.Repository
 
         public bool UpdateOwner(Owner owner)
         {
-            _context.Update(owner);
+            var existing = _context.Owners.FirstOrDefault(o => o.Id == owner.Id);
+            if (existing == null) return false;
+
+            existing.FirstName = owner.FirstName;
+            existing.LastName = owner.LastName;
+            existing.Gym = owner.Gym;
+
+            // Oluşturulma bilgileri varsa elleme:
+            existing.CreatedUserId = existing.CreatedUserId;
+            existing.CreatedUserDateTime = existing.CreatedUserDateTime;
+
+            _context.Update(existing);
             return Save();
         }
+
         public bool SoftDeleteOwner(int id)
         {
             var owner = GetOwner(id);

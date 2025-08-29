@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PokemonReviewApp.Data;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
+using System.Diagnostics.Metrics;
 using System.Security.Claims;
 
 namespace PokemonReviewApp.Repository
@@ -69,11 +70,25 @@ namespace PokemonReviewApp.Repository
             return saved > 0 ? true : false;
         }
 
-        public bool UpdateReviewer(Reviewer reviewer)
+        public bool UpdateReviewer(Reviewer reviewer)  // userId: güncelleyen kullanıcı
         {
-            _context.Update(reviewer);
+            var existing = _context.Reviewers.FirstOrDefault(r => r.Id == reviewer.Id);
+            if (existing == null) return false;
+
+            // Sadece güncellenmesini istediğin alanları kopyala
+            existing.FirstName = reviewer.FirstName;
+            existing.LastName = reviewer.LastName;
+
+            // Oluşturan bilgileri koru, değiştirme
+            existing.CreatedUserId = existing.CreatedUserId;
+            existing.CreatedUserDateTime = existing.CreatedUserDateTime;
+
+           
+            _context.Update(existing);
             return Save();
         }
+
+
         public bool SoftDeleteReviewer(int id)
         {
             var reviewer = GetReviewer(id);

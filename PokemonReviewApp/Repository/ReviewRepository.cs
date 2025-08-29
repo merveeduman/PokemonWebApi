@@ -77,9 +77,22 @@ namespace PokemonReviewApp.Repository
 
         public bool UpdateReview(Review review)
         {
-            _context.Update(review);
+            var existing = _context.Reviews.FirstOrDefault(c => c.Id == review.Id);
+            if (existing == null) return false;
+
+            // Güncellenecek tüm alanları setle
+            existing.Title = review.Title;
+            existing.Text = review.Text;
+            existing.Rating = review.Rating;
+
+            // Oluşturulma bilgilerini değiştirme
+            existing.CreatedUserId = existing.CreatedUserId;
+            existing.CreatedUserDateTime = existing.CreatedUserDateTime;
+
+            _context.Update(existing);
             return Save();
         }
+
         public bool SoftDeleteReview(int id)
         {
             var review = GetReview(id);

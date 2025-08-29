@@ -16,6 +16,8 @@ namespace PokemonReviewApp.Interfaces
 
         ICollection<UserRole> GetAllUserRoles();
         bool SoftDeleteUserRole(int userId, int roleId);
+        Task<bool> CreateUserRoleAsync(UserRoleDto dto);
+
         bool Save();
     }
 

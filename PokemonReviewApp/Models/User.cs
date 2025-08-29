@@ -10,6 +10,7 @@
         
         public bool IsDeleted { get; set; }
         public ICollection<UserRole> UserRoles { get; set; }
+        public ICollection<AuthLog> AuthLogs { get; set; }
 
     }
 }

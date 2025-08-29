@@ -103,6 +103,16 @@ namespace PokemonReviewApp.Controllers
 
             return Ok("Successfully created");
         }
+        [HttpPost("bulk-delete")]
+        public IActionResult BulkDelete([FromBody] BulkDeleteRequestDto request)
+        {
+            if (request == null || request.Ids == null || !request.Ids.Any())
+                return BadRequest("Silinecek ID listesi boş olamaz.");
+
+            var result = _categoryRepository.BulkDelete(request.Ids);
+
+            return Ok(result);
+        }
 
 
         [HttpPut("{categoryId}")]

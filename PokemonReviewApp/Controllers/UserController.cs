@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PokemonReviewApp.Data;
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Interfaces;
 using PokemonReviewApp.Models;
@@ -72,45 +74,47 @@ namespace PokemonReviewApp.Controllers
 
 
         [HttpPost]
-        [ProducesResponseType(201)]
+        [ProducesResponseType(typeof(User), 201)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(422)]
+        [ProducesResponseType(500)]
         [Authorize(Policy = "Permission:KullanıcıEkleme")]
-        public IActionResult CreateUser([FromBody] UserDto userCreate, [FromQuery] int roleId)
+        public async Task<IActionResult> CreateUser([FromBody] UserDto userCreate, [FromQuery] int roleId)
         {
             if (userCreate == null)
-                return BadRequest(ModelState);
+                return BadRequest("User bilgisi boş olamaz.");
 
+            // Aynı email varsa 422 dön
             var existingUser = _userRepository.GetUsers()
                 .FirstOrDefault(u => u.Email.Trim().ToUpper() == userCreate.Email.Trim().ToUpper());
 
             if (existingUser != null)
-            {
-                ModelState.AddModelError("", "User with this email already exists");
-                return StatusCode(422, ModelState);
-            }
+                return StatusCode(422, "User with this email already exists");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var user = _mapper.Map<User>(userCreate);
 
-            if (!_userRepository.CreateUser(user))
+            try
             {
-                ModelState.AddModelError("", "Something went wrong while saving user");
-                return StatusCode(500, ModelState);
+                // Transaction ile user + role + log kaydı
+                var result = await _userRepository.CreateUserWithLogAsync(user, roleId);
+
+                if (!result)
+                    return StatusCode(500, "Kullanıcı oluşturulurken hata oluştu (role/log ile birlikte).");
+
+                // CreatedAtAction yerine direkt 201 + user dönüyoruz
+                return StatusCode(201, user);
             }
-
-            var roleAssigned = _userRoleRepository.AssignRoleToUser(user.Id, roleId);
-
-            if (!roleAssigned)
+            catch (Exception ex)
             {
-                ModelState.AddModelError("", "User created but role assignment failed");
-                return StatusCode(500, ModelState);
+                // Hata detayını sadece loglamak istersen: Console veya ILogger kullanabilirsin
+                Console.WriteLine($"Hata: {ex.Message} | StackTrace: {ex.StackTrace}");
+                return StatusCode(500, "Beklenmedik bir hata oluştu.");
             }
-
-            // Artık UserDto dönmüyoruz, sadece başarılı olduğunu belirtiyoruz
-            return StatusCode(201, true);
         }
+
 
 
 

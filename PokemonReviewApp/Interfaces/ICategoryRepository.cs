@@ -14,7 +14,7 @@ namespace PokemonReviewApp.Interfaces
         //bool DeleteCategory(Category category);
 
 
-
+        BulkDeleteResultDto BulkDelete(List<int> ids);
         bool SoftDeleteCategory(int id);  // soft delete için yapıyyorum
 
 

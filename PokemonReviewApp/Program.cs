@@ -48,11 +48,6 @@ builder.Services.AddControllers(options =>
 });
 
 
-
-
-
-
-
 builder.Services.AddTransient<Seed>();
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -67,6 +62,8 @@ builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 builder.Services.AddScoped<IFoodTypeRepository, FoodTypeRepository>();
 builder.Services.AddScoped<IPokemonFoodRepository, PokemonFoodRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
@@ -76,8 +73,6 @@ builder.Services.AddScoped<PasswordMigrationService>();
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddHttpContextAccessor();
-
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

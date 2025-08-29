@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using PokemonReviewApp.Data; 
 using PokemonReviewApp.Dto;
 using PokemonReviewApp.Hash;
 using PokemonReviewApp.Interfaces;
+using PokemonReviewApp.Models; 
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -14,13 +16,14 @@ public class AuthController : ControllerBase
 {
     private readonly IConfiguration _config;
     private readonly IUserRepository _userRepository;
+    private readonly DataContext _context; 
 
-    public AuthController(IUserRepository userRepository, IConfiguration config)
+    public AuthController(IUserRepository userRepository, IConfiguration config, DataContext context)
     {
         _userRepository = userRepository;
         _config = config;
+        _context = context;
     }
-
 
     [HttpPost("login")]
     [AllowAnonymous]
@@ -37,12 +40,21 @@ public class AuthController : ControllerBase
         if (user.Password != hashedPassword)
             return Unauthorized("Şifre hatalı");
 
+        
+        var log = new AuthLog
+        {
+            UserId = user.Id,
+            LoginDate = DateTime.Now
+        };
 
+        _context.AuthLogs.Add(log);
+        _context.SaveChanges();
+
+        // ➕ Claims ve Token işlemleri
         var claims = new List<Claim>
-{
-    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-};
-
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+        };
 
         var addedPermissions = new List<string>();
 
@@ -74,9 +86,6 @@ public class AuthController : ControllerBase
             claims.Add(new Claim(ClaimTypes.Role, "User"));
         }
 
-
-
-
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtConfig:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
@@ -95,7 +104,4 @@ public class AuthController : ControllerBase
             token = jwt
         });
     }
-
-
-
 }

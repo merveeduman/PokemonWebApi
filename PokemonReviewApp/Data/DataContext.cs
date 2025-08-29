@@ -10,6 +10,8 @@ namespace PokemonReviewApp.Data
         {
 
         }
+        public DbSet<AuthLog> AuthLogs { get; set; }
+        public DbSet<UserLog> UserLog { get; set; }
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Country> Countries { get; set; }
@@ -79,7 +81,7 @@ namespace PokemonReviewApp.Data
 
 
             modelBuilder.Entity<UserRole>()
-      .HasKey(ur => new { ur.UserId, ur.RoleId });
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
 
             modelBuilder.Entity<UserRole>()
                 .HasOne(ur => ur.User)
@@ -92,7 +94,7 @@ namespace PokemonReviewApp.Data
                 .HasForeignKey(ur => ur.RoleId);
 
             modelBuilder.Entity<RolePermission>()
-       .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+                .HasKey(rp => new { rp.RoleId, rp.PermissionId });
 
             modelBuilder.Entity<RolePermission>()
                 .HasOne(rp => rp.Role)
@@ -103,6 +105,14 @@ namespace PokemonReviewApp.Data
                 .HasOne(rp => rp.Permission)
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId);
+
+            modelBuilder.Entity<AuthLog>()
+                .HasKey(a => a.LoginId);
+
+            modelBuilder.Entity<AuthLog>()
+                .HasOne(a => a.User)
+                .WithMany(u => u.AuthLogs)
+                .HasForeignKey(a => a.UserId);
         }
     }
 }

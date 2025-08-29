@@ -62,9 +62,19 @@ namespace PokemonReviewApp.Repository
 
         public bool UpdateCountry(Country country)
         {
-            _context.Update(country);
+            var existing = _context.Countries.FirstOrDefault(c => c.Id == country.Id);
+            if (existing == null) return false;
+
+            existing.Name = country.Name;
+
+            // Bu alanları güncelleME, sadece varsa koru:
+            existing.CreatedUserId = existing.CreatedUserId;
+            existing.CreatedUserDateTime = existing.CreatedUserDateTime;
+
+            _context.Update(existing);
             return Save();
         }
+
 
         public bool SoftDeleteCountry(int id)
         {

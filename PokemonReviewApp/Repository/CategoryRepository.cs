@@ -86,5 +86,31 @@ namespace PokemonReviewApp.Repository
 
             return Save();
         }
+        public BulkDeleteResultDto BulkDelete(List<int> ids)
+        {
+            var result = new BulkDeleteResultDto();
+
+            // Silinecek kayıtları bul
+            var categories = _context.Categories
+                                     .Where(c => ids.Contains(c.Id))
+                                     .ToList();
+
+            var deletedIds = categories.Select(c => c.Id).ToList();
+            var notFoundIds = ids.Except(deletedIds).ToList();
+
+            // Gerçekten silmek yerine soft delete yapıyoruz
+            foreach (var category in categories)
+            {
+                category.IsDeleted = true;
+            }
+
+            _context.SaveChanges();
+
+            result.DeletedIds = deletedIds;
+            result.NotFoundIds = notFoundIds;
+
+            return result;
+        }
+
     }
 }

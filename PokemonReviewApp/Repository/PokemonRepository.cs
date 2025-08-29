@@ -75,12 +75,12 @@ namespace PokemonReviewApp.Repository
 
 
 
-        public bool DeletePokemon(Pokemon pokemon)
+       /* public bool DeletePokemon(Pokemon pokemon)
         {
             _context.Remove(pokemon);
             return Save();
         }
-
+        */
         public Pokemon GetPokemon(int id)
         {
             return _context.Pokemon.Where(p => p.Id == id).FirstOrDefault();
@@ -178,19 +178,33 @@ namespace PokemonReviewApp.Repository
 
         public bool UpdatePokemon(int ownerId, int categoryId, Pokemon pokemon)
         {
-            _context.Update(pokemon);
+            var existing = _context.Pokemon.FirstOrDefault(p => p.Id == pokemon.Id);
+            if (existing == null) return false;
+
+            // Güncellenecek alanlar
+            existing.Name = pokemon.Name;
+            existing.BirthDate = pokemon.BirthDate;
+
+         
+
+            // Oluşturulma bilgileri olduğu gibi kalacak
+            existing.CreatedUserId = existing.CreatedUserId;
+            existing.CreatedUserDateTime = existing.CreatedUserDateTime;
+
+            _context.Update(existing);
             return Save();
         }
         public bool SoftDeletePokemon(int id)
         {
-            var pokemon = GetPokemon(id);
+            var pokemon = _context.Pokemon.FirstOrDefault(p => p.Id == id);
             if (pokemon == null) return false;
 
-            pokemon.IsDeleted = true;
+            pokemon.IsDeleted = true;  
             _context.Update(pokemon);
 
             return Save();
         }
+
 
 
 
